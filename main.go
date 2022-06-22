@@ -7,10 +7,10 @@ import (
 
 func main() {
 	// "Signin" and "Welcome" are the handlers that we will implement
-	http.HandleFunc("/signin", Signup)
-	http.HandleFunc("/welcome", Login)
+	http.HandleFunc("/signup", Signup)
+	http.HandleFunc("/login", Login)
 	http.HandleFunc("/refresh", Refresh)
 
 	// start the server on port 8000
-	log.Fatal(http.ListenAndServe(":8000", nil))
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
