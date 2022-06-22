@@ -1,3 +1,3 @@
-module github.com/ziauddinmohammad/jwt-go
+module github.com/ziauddinmohammad/jwt-go/jwt-go
 
 go 1.18
