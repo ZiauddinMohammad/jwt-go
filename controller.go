@@ -101,7 +101,7 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 		return jwt_key, nil
 	})
 
-	if time.Unix(claim.ExpiresAt, 0).Sub(time.Now()) < 30*time.Second {
+	if time.Until(time.Unix(claim.ExpiresAt, 0)) < 30*time.Second {
 		expiration_time := time.Now().Add(5 * time.Minute)
 		claim.ExpiresAt = expiration_time.Unix()
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
