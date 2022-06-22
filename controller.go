@@ -85,5 +85,38 @@ func Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func Refresh(w http.ResponseWriter, r *http.Request) {
+	c, err := r.Cookie("token")
+	fmt.Println("cookie is ", c)
+	if err != nil {
+		if err == http.ErrNoCookie {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	token := c.Value
+	claim := &Claims{}
+	jwt.ParseWithClaims(token, claim, func(t *jwt.Token) (interface{}, error) {
+		return jwt_key, nil
+	})
 
+	if time.Unix(claim.ExpiresAt, 0).Sub(time.Now()) < 30*time.Second {
+		expiration_time := time.Now().Add(5 * time.Minute)
+		claim.ExpiresAt = expiration_time.Unix()
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
+		signed_token, err := token.SignedString(jwt_key)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		http.SetCookie(w, &http.Cookie{
+			Name:    "token",
+			Value:   signed_token,
+			Expires: expiration_time,
+		})
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(signed_token))
+	}
 }
